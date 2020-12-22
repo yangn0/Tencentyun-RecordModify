@@ -12,16 +12,15 @@ import time
 import operator
 import json
 import urllib.parse
-
 import urllib3
-
+import idkey
 
 urllib3.disable_warnings()
 
 class QcloudApi():
     def __init__(self):
-        self.SecretId = 'AKIDiTzFanjR2Ojp3nuXaVAYgfdO9ey2rMc0'
-        self.secretKey = 'GSO9SVZNEcoky6ylNpJWdVrxiIh6RVJq'
+        self.SecretId = idkey.SecretId
+        self.secretKey = idkey.secretKey
 
     def get(self, module, action, **params):
         config = {
