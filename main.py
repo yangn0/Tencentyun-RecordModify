@@ -1,24 +1,27 @@
+import idkey
 # 获取wan ip
 import paramiko
 
-pkey = paramiko.RSAKey.from_private_key_file('~/.ssh/id_rsa')
+#pkey = paramiko.RSAKey.from_private_key_file('/home/yangn0/.ssh/id_rsa')
+try:
+    # 建立连接
+    trans = paramiko.Transport(('192.168.123.1', 22))
+    trans.connect(username='admin', password=idkey.sshpwd)
 
-# 建立连接
-trans = paramiko.Transport(('192.168.123.1', 22))
-trans.connect(username='admin', pkey=pkey)
+    # 将sshclient的对象的transport指定为以上的trans
+    ssh = paramiko.SSHClient()
+    ssh._transport = trans
 
-# 将sshclient的对象的transport指定为以上的trans
-ssh = paramiko.SSHClient()
-ssh._transport = trans
-
-stdin, stdout, stderr = ssh.exec_command("ifconfig ppp0 | grep 'inet ' | sed 's/^.*addr://g' | sed s/P-t-P.*$//g")
+    stdin, stdout, stderr = ssh.exec_command("/sbin/ifconfig ppp0 | grep 'inet ' | sed 's/^.*addr://g' | sed s/P-t-P.*$//g")
 
 
-# 获取输出
-print(stdout.read())
-
-# 关闭连接
-ssh.close()
+    # 获取输出
+    ip=stdout.read().decode().strip(" \n")
+    print(ip)
+    # 关闭连接
+    ssh.close()
+except Exception as err:
+    print(err)
 
 import json
 from tencentcloud.common import credential
@@ -26,7 +29,7 @@ from tencentcloud.common.profile.client_profile import ClientProfile
 from tencentcloud.common.profile.http_profile import HttpProfile
 from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
 from tencentcloud.dnspod.v20210323 import dnspod_client, models
-import idkey
+
 
 try:
     # 实例化一个认证对象，入参需要传入腾讯云账户 SecretId 和 SecretKey，此处还需注意密钥对的保密
@@ -50,7 +53,7 @@ try:
         "SubDomain": "nas",
         "RecordType": "A",
         "RecordLine": "默认",
-        "Value": "123.180.208.71",
+        "Value": ip,
         "RecordId": 1196437309
     }
     req.from_json_string(json.dumps(params))
@@ -61,4 +64,6 @@ try:
     print(resp.to_json_string())
 
 except TencentCloudSDKException as err:
+    print(err)
+except Exception as err:
     print(err)
