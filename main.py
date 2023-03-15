@@ -13,7 +13,7 @@ try:
     ssh._transport = trans
 
     stdin, stdout, stderr = ssh.exec_command("/sbin/ifconfig ppp0 | grep 'inet ' | sed 's/^.*addr://g' | sed s/P-t-P.*$//g")
-
+    stdin.close()
 
     # 获取输出
     ip=stdout.read().decode().strip(" \n")
