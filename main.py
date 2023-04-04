@@ -1,27 +1,37 @@
 import idkey
 # 获取wan ip
-import paramiko
-
+#import paramiko
 #pkey = paramiko.RSAKey.from_private_key_file('/home/yangn0/.ssh/id_rsa')
-try:
-    # 建立连接
-    trans = paramiko.Transport(('192.168.123.1', 22))
-    trans.connect(username='admin', password=idkey.sshpwd)
+# try:
+#     # 建立连接
+#     trans = paramiko.Transport(('192.168.123.1', 22))
+#     trans.connect(username='admin', password=idkey.sshpwd)
 
-    # 将sshclient的对象的transport指定为以上的trans
-    ssh = paramiko.SSHClient()
-    ssh._transport = trans
+#     # 将sshclient的对象的transport指定为以上的trans
+#     ssh = paramiko.SSHClient()
+#     ssh._transport = trans
 
-    stdin, stdout, stderr = ssh.exec_command("/sbin/ifconfig ppp0 | grep 'inet ' | sed 's/^.*addr://g' | sed s/P-t-P.*$//g")
-    stdin.close()
+#     stdin, stdout, stderr = ssh.exec_command("/sbin/ifconfig ppp0 | grep 'inet ' | sed 's/^.*addr://g' | sed s/P-t-P.*$//g")
+#     stdin.close()
 
-    # 获取输出
-    ip=stdout.read().decode().strip(" \n")
-    print(ip)
-    # 关闭连接
-    ssh.close()
-except Exception as err:
-    print(err)
+#     # 获取输出
+#     ip=stdout.read().decode().strip(" \n")
+#     print(ip)
+#     # 关闭连接
+#     ssh.close()
+# except Exception as err:
+#     print(err)
+import requests
+import requests
+ 
+def get_external_ip():
+    try:
+        ip = requests.get('https://ifconfig.me/ip').text.strip()
+        return ip
+    except:
+        return None
+ip=get_external_ip()
+
 
 import json
 from tencentcloud.common import credential
