@@ -31,7 +31,7 @@ def get_external_ip():
     except:
         return None
 ip=get_external_ip()
-
+print(ip)
 
 import json
 from tencentcloud.common import credential
