@@ -5,15 +5,15 @@ import paramiko
 pkey = paramiko.RSAKey.from_private_key_file('/home/yangn0/.ssh/id_rsa')
 try:
     # 建立连接
-    trans = paramiko.Transport(('192.168.123.1', 10022))
-    trans.connect(username='admin', password=idkey.sshpwd)
+    trans = paramiko.Transport(('192.168.123.2', 10022))
+    trans.connect(username='yangn0', password=idkey.nassshpwd)
 
     # 将sshclient的对象的transport指定为以上的trans
     ssh = paramiko.SSHClient()
     ssh._transport = trans
 
     # stdin, stdout, stderr = ssh.exec_command("/sbin/ifconfig ppp0 | grep 'inet ' | sed 's/^.*addr://g' | sed s/P-t-P.*$//g")
-    stdin, stdout, stderr = ssh.exec_command("/sbin/ifconfig br0 | grep 'Scope:Global' | sed 's/^.*addr://g' | sed 's/\/56.*$//g'")
+    stdin, stdout, stderr = ssh.exec_command("/sbin/ifconfig enp3s0 | grep 'scopeid 0x0<global>' | sed 's/^.*inet6 //g' | sed 's/prefixlen.*$//g'")
     stdin.close()
 
     # 获取输出
@@ -62,11 +62,11 @@ try:
     req = models.ModifyRecordRequest()
     params = {
         "Domain": "yangning.work",
-        "SubDomain": "router",
+        "SubDomain": "nas",
         "RecordType": "AAAA",
         "RecordLine": "默认",
         "Value": ip,
-        "RecordId": 1196437309
+        "RecordId": 1830452196
     }
     req.from_json_string(json.dumps(params))
 
@@ -75,6 +75,20 @@ try:
     # 输出json格式的字符串回包
     print(resp.to_json_string())
 
+    params = {
+        "Domain": "yangning.work",
+        "SubDomain": "cloud",
+        "RecordType": "AAAA",
+        "RecordLine": "默认",
+        "Value": ip,
+        "RecordId": 1890581471
+    }
+    req.from_json_string(json.dumps(params))
+
+    # 返回的resp是一个ModifyRecordResponse的实例，与请求对象对应
+    resp = client.ModifyRecord(req)
+    # 输出json格式的字符串回包
+    print(resp.to_json_string())
 except TencentCloudSDKException as err:
     print(err)
 except Exception as err:
