@@ -12,13 +12,17 @@ try:
     ssh = paramiko.SSHClient()
     ssh._transport = trans
 
-    # stdin, stdout, stderr = ssh.exec_command("/sbin/ifconfig ppp0 | grep 'inet ' | sed 's/^.*addr://g' | sed s/P-t-P.*$//g")
     stdin, stdout, stderr = ssh.exec_command("/sbin/ifconfig br0 | grep 'Scope:Global' | sed 's/^.*addr://g' | sed 's/\/56.*$//g'")
     stdin.close()
 
     # 获取输出
     ip=stdout.read().decode().strip(" \n")
     print(ip)
+    
+    stdin, stdout, stderr = ssh.exec_command("/sbin/ifconfig ppp0 | grep 'inet ' | sed 's/^.*addr://g' | sed s/P-t-P.*$//g")
+    ipv4=stdout.read().decode().strip(" \n")
+    print(ipv4)
+    
     # 关闭连接
     ssh.close()
 except Exception as err:
@@ -67,6 +71,23 @@ try:
         "RecordLine": "默认",
         "Value": ip,
         "RecordId": 1196437309
+    }
+    req.from_json_string(json.dumps(params))
+
+    # 返回的resp是一个ModifyRecordResponse的实例，与请求对象对应
+    resp = client.ModifyRecord(req)
+    # 输出json格式的字符串回包
+    print(resp.to_json_string())
+    
+    # 实例化一个请求对象,每个接口都会对应一个request对象
+    req = models.ModifyRecordRequest()
+    params = {
+        "Domain": "yangning.work",
+        "SubDomain": "ipv4",
+        "RecordType": "A",
+        "RecordLine": "默认",
+        "Value": ipv4,
+        "RecordId": 1967804074
     }
     req.from_json_string(json.dumps(params))
 
