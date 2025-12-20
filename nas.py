@@ -11,8 +11,6 @@ try:
     # 将sshclient的对象的transport指定为以上的trans
     ssh = paramiko.SSHClient()
     ssh._transport = trans
-
-    # stdin, stdout, stderr = ssh.exec_command("/sbin/ifconfig ppp0 | grep 'inet ' | sed 's/^.*addr://g' | sed s/P-t-P.*$//g")
     stdin, stdout, stderr = ssh.exec_command("/sbin/ifconfig enp3s0 | grep 'scopeid 0x0<global>' | sed 's/^.*inet6 //g' | sed 's/prefixlen.*$//g'")
     stdin.close()
 
@@ -24,7 +22,23 @@ try:
 except Exception as err:
     print(err)
 
-import requests
+# ipv4
+try:
+    # 建立连接
+    trans = paramiko.Transport(('192.168.123.1', 10022))
+    trans.connect(username='admin', password=idkey.sshpwd)
+    # 将sshclient的对象的transport指定为以上的trans
+    ssh = paramiko.SSHClient()
+    ssh._transport = trans
+    stdin, stdout, stderr = ssh.exec_command("/sbin/ifconfig ppp0 | grep 'inet ' | sed 's/^.*addr://g' | sed s/P-t-P.*$//g")
+    ipv4=stdout.read().decode().strip(" \n")
+    print(ipv4)
+    # 关闭连接
+    ssh.close()
+except Exception as err:
+    print(err)
+
+# import requests
 # def get_external_ip():
 #     try:
 #         r = requests.get('https://www.ip.cn/api/index?ip&type=0')
@@ -57,7 +71,10 @@ try:
     clientProfile.httpProfile = httpProfile
     # 实例化要请求产品的client对象,clientProfile是可选的
     client = dnspod_client.DnspodClient(cred, "", clientProfile)
+except:
+    pass
 
+try:
     # 实例化一个请求对象,每个接口都会对应一个request对象
     req = models.ModifyRecordRequest()
     params = {
@@ -66,7 +83,7 @@ try:
         "RecordType": "AAAA",
         "RecordLine": "默认",
         "Value": ip,
-        "RecordId": 1830452196
+        "RecordId": 2000299582
     }
     req.from_json_string(json.dumps(params))
 
@@ -81,14 +98,40 @@ try:
         "RecordType": "AAAA",
         "RecordLine": "默认",
         "Value": ip,
-        "RecordId": 1890581471
+        "RecordId": 2000301155
     }
     req.from_json_string(json.dumps(params))
-
-    # 返回的resp是一个ModifyRecordResponse的实例，与请求对象对应
     resp = client.ModifyRecord(req)
-    # 输出json格式的字符串回包
     print(resp.to_json_string())
+
+except:
+    pass
+
+try:
+    params = {
+        "Domain": "yangning.work",
+        "SubDomain": "nas",
+        "RecordType": "A",
+        "RecordLine": "默认",
+        "Value": ipv4,
+        "RecordId": 1968451021
+    }
+    req.from_json_string(json.dumps(params))
+    resp = client.ModifyRecord(req)
+    print(resp.to_json_string())
+
+    params = {
+        "Domain": "yangning.work",
+        "SubDomain": "cloud",
+        "RecordType": "A",
+        "RecordLine": "默认",
+        "Value": ipv4,
+        "RecordId": 1968451393
+    }
+    req.from_json_string(json.dumps(params))
+    resp = client.ModifyRecord(req)
+    print(resp.to_json_string())
+
 except TencentCloudSDKException as err:
     print(err)
 except Exception as err:

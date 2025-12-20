@@ -18,11 +18,11 @@ try:
     # 获取输出
     ip=stdout.read().decode().strip(" \n")
     print(ip)
-    
+
     stdin, stdout, stderr = ssh.exec_command("/sbin/ifconfig ppp0 | grep 'inet ' | sed 's/^.*addr://g' | sed s/P-t-P.*$//g")
     ipv4=stdout.read().decode().strip(" \n")
     print(ipv4)
-    
+
     # 关闭连接
     ssh.close()
 except Exception as err:
@@ -70,7 +70,7 @@ try:
         "RecordType": "AAAA",
         "RecordLine": "默认",
         "Value": ip,
-        "RecordId": 1196437309
+        "RecordId": 2000299540
     }
     req.from_json_string(json.dumps(params))
 
@@ -78,7 +78,11 @@ try:
     resp = client.ModifyRecord(req)
     # 输出json格式的字符串回包
     print(resp.to_json_string())
-    
+
+except:
+    print('ipv6 router set fail')
+
+try:
     # 实例化一个请求对象,每个接口都会对应一个request对象
     req = models.ModifyRecordRequest()
     params = {
