@@ -26,7 +26,7 @@ except Exception as err:
 try:
     # 建立连接
     trans = paramiko.Transport(('192.168.123.1', 10022))
-    trans.connect(username='admin', password=idkey.sshpwd)
+    trans.connect(username=idkey.username, password=idkey.sshpwd)
     # 将sshclient的对象的transport指定为以上的trans
     ssh = paramiko.SSHClient()
     ssh._transport = trans
